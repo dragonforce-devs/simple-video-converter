@@ -17,10 +17,10 @@ class VidConvertWindow(QWidget, Ui_Form):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        "self.listWidget_2.itemSelectionChanged.connect(self.itemActivated_event)"
-        self.pushButton_3.clicked.connect(self.play)
-        self.pushButton_4.clicked.connect(self.stop)
-        self.pushButton_open.clicked.connect(self.open)
+        # "self.listWidget_2.itemSelectionChanged.connect(self.itemActivated_event)"
+        self.btnStop.clicked.connect(self.stop_convertion)
+        self.btnAdd.clicked.connect(self.add_files)
+        self.btnConvert.clicked.connect(self.start_convertion)
         self.post_init()
         self.addVideoProfiles()
 
@@ -34,25 +34,26 @@ class VidConvertWindow(QWidget, Ui_Form):
         """
         does extra
         """
-        self.pushButton_3.setIcon(QtGui.QPixmap('./icons/start.ico'))
-        self.pushButton_open.setIcon(QtGui.QPixmap('./icons/file.ico'))
-        self.pushButton_4.setIcon(QtGui.QPixmap('./icons/stop.ico'))
-
-        self.pushButton_3.setText('')
-        self.pushButton_4.setText('')
+        self.btnConvert.setIcon(QtGui.QPixmap('./icons/start.ico'))
+        self.btnAdd.setIcon(QtGui.QPixmap('./icons/file.ico'))
+        self.btnStop.setIcon(QtGui.QPixmap('./icons/stop.ico'))
 
         self.setWindowTitle("Simple Video Converter")
         self.setGeometry(100, 100, 640, 480)
         
-        self.pushButton_open.setFixedSize(50,30)
-        self.pushButton_3.setFixedSize(50,30)
-        self.pushButton_4.setFixedSize(50,30)
-        self.pushButton.setFixedSize(50,30)
-
-        self.pushButton_4.setEnabled(False)
-        self.listWidget_format.setFixedWidth(200)
-
+        self.btnAdd.setFixedSize(50,30)
+        self.btnConvert.setFixedSize(50,30)
+        self.btnStop.setFixedSize(50,30)
         
+
+    def add_files(self):
+        pass
+    
+    def start_convertion(self):
+        pass
+    
+    def stop_convertion(self):
+        pass
 
     def play(self):
         self.pushButton_4.setEnabled(True)
@@ -67,30 +68,30 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.pushButton_open.setEnabled(True)
 
     def addVideoProfiles(self):
-        
-        """
-        Here we add the format list items
-        """
+        pass
+    #     """
+    #     Here we add the format list items
+    #     """
                
-        k=1
-        format = ['AVI', 'MP4', 'WMV']
-        for i in format:
-            for j in range (1,4):
-                item = str(k)+')'+' '+i+' ' +str(j)
-                k = k+1
-                self.listWidget_format.addItem(item)
+    #     k=1
+    #     format = ['AVI', 'MP4', 'WMV']
+    #     for i in format:
+    #         for j in range (1,4):
+    #             item = str(k)+')'+' '+i+' ' +str(j)
+    #             k = k+1
+    #             self.listWidget_format.addItem(item)
 
 
-    def open(self):
+    # def open(self):
 
-        """
-        Select Video Files
-        """
-        options = QtWidgets.QFileDialog.Options()
-        loc, _ = QtWidgets.QFileDialog.getOpenFileNames(None,"Open File","", "Videos (*.mp4 *.avi *.wmv *.mkv *.flv *.dat);;All Files(*.*)")
-        for i in loc:
-            self.listWidget_files.addItem(i)
-                
+    #     """
+    #     Select Video Files
+    #     """
+    #     options = QtWidgets.QFileDialog.Options()
+    #     loc, _ = QtWidgets.QFileDialog.getOpenFileNames(None,"Open File","", "Videos (*.mp4 *.avi *.wmv *.mkv *.flv *.dat);;All Files(*.*)")
+    #     for i in loc:
+    #         self.listWidget_files.addItem(i)
+    
 
 if __name__ == "__main__":
     APP = QApplication(sys.argv)

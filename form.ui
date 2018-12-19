@@ -15,26 +15,26 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="layoutViews">
      <item>
-      <widget class="QListWidget" name="listWidget_files"/>
+      <widget class="QListView" name="listViewFiles"/>
      </item>
      <item>
-      <widget class="QListWidget" name="listWidget_format"/>
+      <widget class="QListView" name="listViewTypes"/>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <layout class="QVBoxLayout" name="layoutProgressBars">
      <item>
-      <widget class="QProgressBar" name="progressBar">
+      <widget class="QProgressBar" name="progressBarCurrent">
        <property name="value">
         <number>24</number>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QProgressBar" name="progressBar_2">
+      <widget class="QProgressBar" name="progressBarTotal">
        <property name="value">
         <number>24</number>
        </property>
@@ -43,32 +43,25 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QHBoxLayout" name="layoutButtons">
      <item>
-      <widget class="QPushButton" name="pushButton_open">
+      <widget class="QPushButton" name="btnAdd">
        <property name="text">
-        <string/>
+        <string>Add Files</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_3">
+      <widget class="QPushButton" name="btnConvert">
        <property name="text">
-        <string>PushButton</string>
+        <string>Convert</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_4">
+      <widget class="QPushButton" name="btnStop">
        <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>PushButton</string>
+        <string>Stop</string>
        </property>
       </widget>
      </item>
