@@ -1,6 +1,4 @@
 __pycache__/
-__pycache__/*
 .vscode/
 venv/
 *.pyc
-__pycache__/Form.cpython-37.pyc
