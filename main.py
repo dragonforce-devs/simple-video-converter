@@ -29,7 +29,6 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.btnAdd.clicked.connect(self.add_files)
         self.btnConvert.clicked.connect(self.start_convertion)
         self.post_init()
-        self.addVideoProfiles()
 
     def post_init(self):
         """runs after init"""
