@@ -4,22 +4,26 @@ This is a video converter
 import sys
 
 from PySide2.QtWidgets import QApplication, QWidget, QFileDialog
-from PySide2 import QtGui, QtWidgets
+from PySide2.QtGui import QPixmap, QStandardItemModel, QStandardItem
 
 from Form import Ui_Form
 
+DEBUG = False
+
 
 class VidConvertWindow(QWidget, Ui_Form):
-    """
-    main class
-    """
-    item = ''
-
+    """this is the main class for video converter"""
     def __init__(self):
         super().__init__()
         self.setupUi(self)
 
-        self.filePicker = QFileDialog(self)
+        self.available_formats = ["x", "y", "z"]
+
+        self.file_picker = QFileDialog(self)
+        self.file_list_model = QStandardItemModel(self.listViewFiles)
+        self.listViewFiles.setModel(self.file_list_model)
+        self.type_list_model = QStandardItemModel(self.listViewTypes)
+        self.listViewTypes.setModel(self.type_list_model)
 
         self.btnStop.clicked.connect(self.stop_convertion)
         self.btnAdd.clicked.connect(self.add_files)
@@ -27,79 +31,44 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.post_init()
         self.addVideoProfiles()
 
-    """
-    def itemActivated_event(self):
-        self.item = self.listWidget_2.selectedItems()[0].text()
-    """
-
     def post_init(self):
-        """
-        does extra
-        """
-        self.btnConvert.setIcon(QtGui.QPixmap('./icons/start.ico'))
-        self.btnAdd.setIcon(QtGui.QPixmap('./icons/file.ico'))
-        self.btnStop.setIcon(QtGui.QPixmap('./icons/stop.ico'))
+        """runs after init"""
+        self.btnConvert.setIcon(QPixmap('./icons/start.ico'))
+        self.btnAdd.setIcon(QPixmap('./icons/file.ico'))
+        self.btnStop.setIcon(QPixmap('./icons/stop.ico'))
 
         self.setWindowTitle("Simple Video Converter")
         self.setGeometry(100, 100, 640, 480)
 
-        # self.btnAdd.setFixedSize(50,30)
-        # self.btnConvert.setFixedSize(50,30)
-        # self.btnStop.setFixedSize(50,30)
+        for filetype in self.available_formats:
+            self.add_item2model(filetype, self.type_list_model)
+
+    def add_item2model(self, filename: str, model: QStandardItemModel):
+        """sample listview code"""
+        list_item = QStandardItem(filename)
+        list_item.setCheckable(True)
+        list_item.setEditable(False)
+        model.appendRow(list_item)
 
     def add_files(self):
-        self.filePicker.setFileMode(QFileDialog.ExistingFiles)
-        self.filePicker.setNameFilter("Videos (*.mp4 *.mkv *.mov)")
-        self.filePicker.setViewMode(QFileDialog.Detail)
-        if self.filePicker.exec_():
-            files_selected = self.filePicker.selectedFiles()
-            for f in files_selected:
-                print(f)
-        pass
+        """opens file picker for choosing files"""
+        self.file_picker.setFileMode(QFileDialog.ExistingFiles)
+        self.file_picker.setNameFilter("Videos (*.mp4 *.mkv *.mov)")
+        self.file_picker.setViewMode(QFileDialog.Detail)
+        if self.file_picker.exec_():
+            files_selected = self.file_picker.selectedFiles()
+            for file in files_selected:
+                self.add_item2model(file, self.file_list_model)
+                if DEBUG:
+                    print(file)
 
     def start_convertion(self):
-        pass
+        """implement conversion task"""
+        print("Not implemented")
 
     def stop_convertion(self):
-        pass
-
-    def play(self):
-        self.pushButton_4.setEnabled(True)
-        self.pushButton_3.setEnabled(False)
-        self.pushButton_open.setEnabled(False)
-        self.item = self.listWidget_format.selectedItems()[0].text()
-        print(self.item)
-
-    def stop(self):
-        self.pushButton_4.setEnabled(False)
-        self.pushButton_3.setEnabled(True)
-        self.pushButton_open.setEnabled(True)
-
-    def addVideoProfiles(self):
-        pass
-
-    #     """
-    #     Here we add the format list items
-    #     """
-
-    #     k=1
-    #     format = ['AVI', 'MP4', 'WMV']
-    #     for i in format:
-    #         for j in range (1,4):
-    #             item = str(k)+')'+' '+i+' ' +str(j)
-    #             k = k+1
-    #             self.listWidget_format.addItem(item)
-
-    # def open(self):
-
-    #     """
-    #     Select Video Files
-    #     """
-    #     options = QtWidgets.QFileDialog.Options()
-    #     loc, _ = QtWidgets.QFileDialog.getOpenFileNames(None,"Open File","", "Videos (*.mp4 *.avi *.wmv *.mkv *.flv *.dat);;All Files(*.*)")
-    #     for i in loc:
-    #         self.listWidget_files.addItem(i)
-
+        """stop running coversion task"""
+        print("Not implemented")
 
 if __name__ == "__main__":
     APP = QApplication(sys.argv)
