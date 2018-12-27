@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'form.ui',
 # licensing of 'form.ui' applies.
 #
-# Created: Wed Dec 19 23:09:33 2018
+# Created: Thu Dec 20 17:55:28 2018
 #      by: pyside2-uic  running on PySide2 5.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -27,28 +27,31 @@ class Ui_Form(object):
         self.verticalLayout_2.addLayout(self.horizontalLayout)
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
-        self.progressBar = QtWidgets.QProgressBar(Form)
-        self.progressBar.setProperty("value", 24)
-        self.progressBar.setObjectName("progressBar")
-        self.verticalLayout.addWidget(self.progressBar)
-        self.progressBar_2 = QtWidgets.QProgressBar(Form)
-        self.progressBar_2.setProperty("value", 24)
-        self.progressBar_2.setObjectName("progressBar_2")
-        self.verticalLayout.addWidget(self.progressBar_2)
+        self.progbarTotal = QtWidgets.QProgressBar(Form)
+        self.progbarTotal.setProperty("value", 24)
+        self.progbarTotal.setObjectName("progbarTotal")
+        self.verticalLayout.addWidget(self.progbarTotal)
+        self.progbarCurrent = QtWidgets.QProgressBar(Form)
+        self.progbarCurrent.setProperty("value", 24)
+        self.progbarCurrent.setObjectName("progbarCurrent")
+        self.verticalLayout.addWidget(self.progbarCurrent)
         self.verticalLayout_2.addLayout(self.verticalLayout)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.pushButton_open = QtWidgets.QPushButton(Form)
-        self.pushButton_open.setText("")
-        self.pushButton_open.setObjectName("pushButton_open")
-        self.horizontalLayout_2.addWidget(self.pushButton_open)
-        self.pushButton_3 = QtWidgets.QPushButton(Form)
-        self.pushButton_3.setObjectName("pushButton_3")
-        self.horizontalLayout_2.addWidget(self.pushButton_3)
-        self.pushButton_4 = QtWidgets.QPushButton(Form)
-        self.pushButton_4.setObjectName("pushButton_4")
-        self.horizontalLayout_2.addWidget(self.pushButton_4)
+        self.btnOpen = QtWidgets.QPushButton(Form)
+        self.btnOpen.setText("")
+        self.btnOpen.setObjectName("btnOpen")
+        self.horizontalLayout_2.addWidget(self.btnOpen)
+        self.btnStart = QtWidgets.QPushButton(Form)
+        self.btnStart.setText("")
+        self.btnStart.setObjectName("btnStart")
+        self.horizontalLayout_2.addWidget(self.btnStart)
+        self.btnStop = QtWidgets.QPushButton(Form)
+        self.btnStop.setText("")
+        self.btnStop.setObjectName("btnStop")
+        self.horizontalLayout_2.addWidget(self.btnStop)
         self.pushButton = QtWidgets.QPushButton(Form)
+        self.pushButton.setText("")
         self.pushButton.setObjectName("pushButton")
         self.horizontalLayout_2.addWidget(self.pushButton)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
@@ -58,7 +61,4 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(QtWidgets.QApplication.translate("Form", "Form", None, -1))
-        self.pushButton_3.setText(QtWidgets.QApplication.translate("Form", "PushButton", None, -1))
-        self.pushButton_4.setText(QtWidgets.QApplication.translate("Form", "PushButton", None, -1))
-        self.pushButton.setText(QtWidgets.QApplication.translate("Form", "PushButton", None, -1))
 
