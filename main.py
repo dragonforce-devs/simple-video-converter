@@ -34,7 +34,7 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.int_stop_flag = 1
         #self.connect(self, QtCore.SIGNAL("Progressvalue"), self.increaseBar)
         self.thread_thd = QProcess() 
-        self.thread_thd.setWorkingDirectory('/home/avenger047/Desktop/')
+        self.thread_thd.setWorkingDirectory('/')
         self.dat = ''
         self.signal_bar.connect(self.setBar)
         #self.thread_thd.readyReadStandardOutput.connect(self.startConvert)
@@ -86,7 +86,7 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.thread_thd.close()
         
         #Read Video length
-        with open('/home/avenger047/Desktop/tot.txt', 'r') as f:
+        with open('/tot.txt', 'r') as f:
             self.float_timetot = float(f.read())
             #print(self.float_timetot)
 
@@ -183,7 +183,7 @@ class VidConvertWindow(QWidget, Ui_Form):
 
     def getItem(self):
         print('Got Item')
-        print(self.listViewFormat.getSelectedItems[0])
+        #print(self.listViewFormat.getSelectedItems[0])
 
 
 
