@@ -53,7 +53,7 @@ class VidConvertWindow(QWidget, Ui_Form):
         does extra
         """
         self.btnStart.setIcon(QtGui.QPixmap('./icons/start.ico'))
-        self.btnOpen.setIcon(QtGui.QPixmap('./icons/file.ico'))
+        self.btnOpen.setIcon(QtGui.QPixmap('./icons/file.jpg'))
         self.btnStop.setIcon(QtGui.QPixmap('./icons/stop.ico'))
 
 
