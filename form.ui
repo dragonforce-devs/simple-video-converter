@@ -17,10 +17,10 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QListWidget" name="listWidget_files"/>
+      <widget class="QListView" name="listViewFiles"/>
      </item>
      <item>
-      <widget class="QListWidget" name="listWidget_format"/>
+      <widget class="QListView" name="listViewFormat"/>
      </item>
     </layout>
    </item>

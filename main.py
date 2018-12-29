@@ -8,7 +8,7 @@ from time import sleep
 import threading
 from PySide2.QtWidgets import QApplication, QWidget
 from PySide2 import QtGui, QtWidgets, QtCore
-#from multiprocessing import Process
+from PySide2.QtGui import QStandardItemModel, QStandardItem
 from PySide2.QtCore import Signal
 from PySide2.QtCore import QProcess, QIODevice, QByteArray
 
@@ -25,18 +25,26 @@ class VidConvertWindow(QWidget, Ui_Form):
         super().__init__()
         self.setupUi(self)
         "self.listWidget_2.itemSelectionChanged.connect(self.itemActivated_event)"
-        self.btnStart.clicked.connect(self.play)
+        self.btnStart.clicked.connect(self.startConvert)
         self.btnStop.clicked.connect(self.stop)
         self.btnOpen.clicked.connect(self.open)
-        self.post_init()
-        self.addVideoProfiles()
+        
+        self.listViewFormat.clicked.connect(self.getItem)
+
         self.int_stop_flag = 1
         #self.connect(self, QtCore.SIGNAL("Progressvalue"), self.increaseBar)
         self.thread_thd = QProcess() 
-        self.thread_thd.setWorkingDirectory('/')
+        self.thread_thd.setWorkingDirectory('/home/avenger047/Desktop/')
         self.dat = ''
         self.signal_bar.connect(self.setBar)
         #self.thread_thd.readyReadStandardOutput.connect(self.startConvert)
+
+        self.file_list_model = QStandardItemModel(self.listViewFiles)
+        self.listViewFiles.setModel(self.file_list_model)
+        self.format_list_model = QStandardItemModel(self.listViewFormat)
+        self.listViewFormat.setModel(self.format_list_model)
+        self.selected_format = ''
+        self.post_init()
 
 
 
@@ -58,20 +66,21 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.pushButton.setFixedSize(50,30)
 
         self.btnStop.setEnabled(False)
-        self.listWidget_format.setFixedWidth(200)
+        self.listViewFormat.setFixedWidth(200)
         self.progbarCurrent.setValue(0)
         self.progbarTotal.setValue(0)
+        self.addToListView(['avi', 'mp4', 'wmv'], self.format_list_model)
 
         
 
-    def play(self):
+    def startConvert(self):
         
         
         #Toggling Buttons and detting current video length
         
         self.toggleButtons('set')
-        self.item = self.listWidget_format.selectedItems()[0].text()
-        print(self.item)
+        #self.item = self.listWidget_format.selectedItems()[0].text()
+        #print(self.item)
         self.thread_thd.start("sh",["-c",'ffprobe -i vid.mp4 -show_entries format=duration -v quiet -of csv="p=0"> tot.txt'])
         self.thread_thd.waitForFinished()
         self.thread_thd.close()
@@ -98,9 +107,7 @@ class VidConvertWindow(QWidget, Ui_Form):
     def stop(self):
 
         self.int_stop_flag = 0
-        self.btnStop.setEnabled(False)
-        self.btnOpen.setEnabled(True)
-        self.btnStart.setEnabled(True)
+        self.toggleButtons('reset')
 
 
     def setBar(self, i):
@@ -108,19 +115,15 @@ class VidConvertWindow(QWidget, Ui_Form):
         #Set Progress bar from the received signal
         self.progbarCurrent.setValue(i)
 
-    def addVideoProfiles(self):
+    def addToListView(self, names, model: QStandardItemModel):
+
+        for items in names:
+            list_item = QStandardItem(items)
+            list_item.setCheckable(False)
+            list_item.setEditable(False)
+            model.appendRow(list_item)
         
-        """
-        Here we add the format list items
-        """
-               
-        int_k=1
-        format = ['AVI', 'MP4', 'WMV']
-        for i in format:
-            for j in range (1,4):
-                item = str(int_k)+')'+' '+i+' ' +str(j)
-                int_k += 1
-                self.listWidget_format.addItem(item)
+        
 
 
     def open(self):
@@ -128,10 +131,9 @@ class VidConvertWindow(QWidget, Ui_Form):
         """
         Select Video Files
         """
-        
+        #self.file_list_model.clear() 
         list_loc, _ = QtWidgets.QFileDialog.getOpenFileNames(None,"Open File","", "Videos (*.mp4 *.avi *.wmv *.mkv *.flv *.dat);;All Files(*.*)")
-        for i in list_loc:
-            self.listWidget_files.addItem(i)
+        self.addToListView(list_loc, self.file_list_model)
 
 
    
@@ -146,7 +148,7 @@ class VidConvertWindow(QWidget, Ui_Form):
                     last_line = lines[-1]
                     if ('time=' in last_line): #filter by keyword 'time'
                         str_progress = last_line[last_line.index('time=') + len('time='):last_line.index('time=')+16]
-                        print(str_progress)
+                        #print(str_progress)
                         hh, mm, ss = str_progress.split(':')
                         int_progress = (float(hh) * 3600 + float(mm) * 60)
                         ss, sss = ss.split('.')
@@ -177,6 +179,11 @@ class VidConvertWindow(QWidget, Ui_Form):
             self.btnStart.setEnabled(True)
         else:
             pass
+
+
+    def getItem(self):
+        print('Got Item')
+        print(self.listViewFormat.getSelectedItems[0])
 
 
 

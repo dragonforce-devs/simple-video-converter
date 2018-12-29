@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'form.ui',
 # licensing of 'form.ui' applies.
 #
-# Created: Thu Dec 20 17:55:28 2018
+# Created: Sat Dec 29 14:00:49 2018
 #      by: pyside2-uic  running on PySide2 5.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -18,12 +18,12 @@ class Ui_Form(object):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.listWidget_files = QtWidgets.QListWidget(Form)
-        self.listWidget_files.setObjectName("listWidget_files")
-        self.horizontalLayout.addWidget(self.listWidget_files)
-        self.listWidget_format = QtWidgets.QListWidget(Form)
-        self.listWidget_format.setObjectName("listWidget_format")
-        self.horizontalLayout.addWidget(self.listWidget_format)
+        self.listViewFiles = QtWidgets.QListView(Form)
+        self.listViewFiles.setObjectName("listViewFiles")
+        self.horizontalLayout.addWidget(self.listViewFiles)
+        self.listViewFormat = QtWidgets.QListView(Form)
+        self.listViewFormat.setObjectName("listViewFormat")
+        self.horizontalLayout.addWidget(self.listViewFormat)
         self.verticalLayout_2.addLayout(self.horizontalLayout)
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
