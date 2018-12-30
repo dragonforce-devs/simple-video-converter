@@ -10,7 +10,7 @@ from PySide2.QtWidgets import QApplication, QWidget
 from PySide2 import QtGui, QtWidgets, QtCore
 from PySide2.QtGui import QStandardItemModel, QStandardItem
 from PySide2.QtCore import Signal
-from PySide2.QtCore import QProcess, QIODevice, QByteArray
+from PySide2.QtCore import QProcess, QIODevice, QByteArray, Qt
 
 from Form import Ui_Form
 
@@ -70,7 +70,7 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.listViewFormat.setFixedWidth(200)
         self.progbarCurrent.setValue(0)
         self.progbarTotal.setValue(0)
-        self.addToListView(['avi', 'mp4', 'wmv'], self.format_list_model, True)
+        self.addToListView(['avi', 'mp4', 'wmv'], self.format_list_model, False)
 
         
 
@@ -78,10 +78,9 @@ class VidConvertWindow(QWidget, Ui_Form):
         
         
         #Toggling Buttons and detting current video length
-        
+        print('The selected format is :', self.selected_format)
         self.toggleButtons('set')
-        #self.item = self.listWidget_format.selectedItems()[0].text()
-        #print(self.item)
+     
         self.thread_thd.start("sh",["-c",'ffprobe -i vid.mp4 -show_entries format=duration -v quiet -of csv="p=0"> tot.txt'])
         self.thread_thd.waitForFinished()
         self.thread_thd.close()
@@ -185,12 +184,9 @@ class VidConvertWindow(QWidget, Ui_Form):
     def getItem(self):
 		#Yet to be implemented
         print('Got Item')
-        
-        for index in range(self.format_list_model.rowCount()):
-            item = self.format_list_model.item(index)
-            if item.checkState() == QtCore.Qt.Checked:
-                print (item.text())
-
+        index = self.listViewFormat.currentIndex()
+        sel_format = index.data(Qt.DisplayRole)
+        self.selected_format = sel_format
 
 
 if __name__ == "__main__":
