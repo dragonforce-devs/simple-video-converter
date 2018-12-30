@@ -34,7 +34,7 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.int_stop_flag = 1
         #self.connect(self, QtCore.SIGNAL("Progressvalue"), self.increaseBar)
         self.thread_thd = QProcess() 
-        self.thread_thd.setWorkingDirectory('/')
+        self.thread_thd.setWorkingDirectory('/home/avenger047/Desktop/')
         self.dat = ''
         self.signal_bar.connect(self.setBar)
         #self.thread_thd.readyReadStandardOutput.connect(self.startConvert)
@@ -43,6 +43,7 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.listViewFiles.setModel(self.file_list_model)
         self.format_list_model = QStandardItemModel(self.listViewFormat)
         self.listViewFormat.setModel(self.format_list_model)
+        #self.listViewFormat.setSelectionMode(SingleSelection)
         self.selected_format = ''
         self.post_init()
 
@@ -69,7 +70,7 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.listViewFormat.setFixedWidth(200)
         self.progbarCurrent.setValue(0)
         self.progbarTotal.setValue(0)
-        self.addToListView(['avi', 'mp4', 'wmv'], self.format_list_model)
+        self.addToListView(['avi', 'mp4', 'wmv'], self.format_list_model, True)
 
         
 
@@ -86,7 +87,7 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.thread_thd.close()
         
         #Read Video length
-        with open('/tot.txt', 'r') as f:
+        with open('/home/avenger047/Desktop/tot.txt', 'r') as f:
             self.float_timetot = float(f.read())
             #print(self.float_timetot)
 
@@ -115,11 +116,11 @@ class VidConvertWindow(QWidget, Ui_Form):
         #Set Progress bar from the received signal
         self.progbarCurrent.setValue(i)
 
-    def addToListView(self, names, model: QStandardItemModel):
+    def addToListView(self, names, model: QStandardItemModel, checkable: bool):
 
         for items in names:
             list_item = QStandardItem(items)
-            list_item.setCheckable(False)
+            list_item.setCheckable(checkable)
             list_item.setEditable(False)
             model.appendRow(list_item)
         
@@ -133,7 +134,7 @@ class VidConvertWindow(QWidget, Ui_Form):
         """
         #self.file_list_model.clear() 
         list_loc, _ = QtWidgets.QFileDialog.getOpenFileNames(None,"Open File","", "Videos (*.mp4 *.avi *.wmv *.mkv *.flv *.dat);;All Files(*.*)")
-        self.addToListView(list_loc, self.file_list_model)
+        self.addToListView(list_loc, self.file_list_model, False)
 
 
    
@@ -184,7 +185,11 @@ class VidConvertWindow(QWidget, Ui_Form):
     def getItem(self):
 		#Yet to be implemented
         print('Got Item')
-        #print(self.listViewFormat.getSelectedItems[0])
+        
+        for index in range(self.format_list_model.rowCount()):
+            item = self.format_list_model.item(index)
+            if item.checkState() == QtCore.Qt.Checked:
+                print (item.text())
 
 
 
