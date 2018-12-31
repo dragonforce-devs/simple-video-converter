@@ -76,7 +76,13 @@ class VidConvertWindow(QWidget, Ui_Form):
 
     def convertClicked(self):
         
-        i=0
+        #Getting all items from file_list_model
+        """
+            This part has not yet been fully implemented.
+            Here our objective is to iterate over all the list items and perform the
+            convert operation.
+            For now, the whole thing works for a single input only
+        """
         for index in range(self.file_list_model.rowCount()):
             self.current_file = str(self.file_list_model.item(index).data(Qt.DisplayRole))
             self.startConvert()
