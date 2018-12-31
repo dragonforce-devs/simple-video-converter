@@ -25,26 +25,26 @@ class VidConvertWindow(QWidget, Ui_Form):
         super().__init__()
         self.setupUi(self)
         "self.listWidget_2.itemSelectionChanged.connect(self.itemActivated_event)"
-        self.btnStart.clicked.connect(self.startConvert)
+        self.btnStart.clicked.connect(self.convertClicked)
         self.btnStop.clicked.connect(self.stop)
         self.btnOpen.clicked.connect(self.open)
         
         self.listViewFormat.clicked.connect(self.getItem)
 
         self.int_stop_flag = 1
-        #self.connect(self, QtCore.SIGNAL("Progressvalue"), self.increaseBar)
         self.thread_thd = QProcess() 
-        self.thread_thd.setWorkingDirectory('/')
+        #self.thread_thd.setWorkingDirectory('/')
         self.dat = ''
         self.signal_bar.connect(self.setBar)
-        #self.thread_thd.readyReadStandardOutput.connect(self.startConvert)
-
+        
         self.file_list_model = QStandardItemModel(self.listViewFiles)
         self.listViewFiles.setModel(self.file_list_model)
         self.format_list_model = QStandardItemModel(self.listViewFormat)
         self.listViewFormat.setModel(self.format_list_model)
         #self.listViewFormat.setSelectionMode(SingleSelection)
         self.selected_format = ''
+        self.file_list = ''
+        self.current_file = ''
         self.post_init()
 
 
@@ -74,26 +74,39 @@ class VidConvertWindow(QWidget, Ui_Form):
 
         
 
+    def convertClicked(self):
+        
+        i=0
+        for index in range(self.file_list_model.rowCount()):
+            self.current_file = str(self.file_list_model.item(index).data(Qt.DisplayRole))
+            self.startConvert()
+    
+    
+    
+    
+    
     def startConvert(self):
         
         
         #Toggling Buttons and detting current video length
-        print('The selected format is :', self.selected_format)
+
+        dir_loc = self.current_file.rsplit('/',1)[0]
+        #print('The selected format is :', self.selected_format)
         self.toggleButtons('set')
-     
-        self.thread_thd.start("sh",["-c",'ffprobe -i vid.mp4 -show_entries format=duration -v quiet -of csv="p=0"> tot.txt'])
+        #print('ffprobe -i ' + file_loc + ' -show_entries format=duration -v quiet -of csv="p=0"> tot.txt')
+        self.thread_thd.start("sh",["-c",'ffprobe -i ' + self.current_file + ' -show_entries format=duration -v quiet -of csv="p=0">' + dir_loc + '/tot.txt'])
         self.thread_thd.waitForFinished()
         self.thread_thd.close()
         
         #Read Video length
-        with open('tot.txt', 'r') as f:
+        with open((dir_loc+'/tot.txt'), 'r') as f:
             self.float_timetot = float(f.read())
             #print(self.float_timetot)
 
         self.progbarCurrent.setMaximum(self.float_timetot)
 
 
-        self.thread_thd.start("sh", ["-c","ffmpeg -i vid.mp4 testr.avi 2> test.txt"]) #Start the conversion process
+        self.thread_thd.start("sh", ["-c","ffmpeg -i " + self.current_file + " " + dir_loc  + "/testr.avi 2>" + dir_loc + "/test.txt"]) #Start the conversion process
         print("starting Convert")
 
         #Read the log file to set progress using a new thread
@@ -134,6 +147,7 @@ class VidConvertWindow(QWidget, Ui_Form):
         #self.file_list_model.clear() 
         list_loc, _ = QtWidgets.QFileDialog.getOpenFileNames(None,"Open File","", "Videos (*.mp4 *.avi *.wmv *.mkv *.flv *.dat);;All Files(*.*)")
         self.addToListView(list_loc, self.file_list_model, False)
+        self.file_list = list_loc
 
 
    
@@ -141,11 +155,14 @@ class VidConvertWindow(QWidget, Ui_Form):
         
         print("Reading File")
         i = 1
-        while i:
+        while i==1:
             try:
-                with open('/home/avenger047/Desktop/test.txt', 'r') as f:
+                #print(self.current_file.rsplit('/',1)[0] + '/test.txt')
+                with open((self.current_file.rsplit('/',1)[0] + '/test.txt'), 'r') as f:
+                    
                     lines = f.read().splitlines() #Get the end line
                     last_line = lines[-1]
+                                        
                     if ('time=' in last_line): #filter by keyword 'time'
                         str_progress = last_line[last_line.index('time=') + len('time='):last_line.index('time=')+16]
                         #print(str_progress)
@@ -157,12 +174,19 @@ class VidConvertWindow(QWidget, Ui_Form):
                         end = int_progress/self.float_timetot
                         #print(end)
                         if (end >= 0.98):
-                            self.signal_bar.emit(float_timetot)
+                            #print('> 0.98')
+                            self.signal_bar.emit(self.float_timetot)
+                            self.toggleButtons('reset')
                             i=0
-                            break
+                            
+                        else:
+                            pass
                     
+                    else:
+                        pass
             except:
                 pass
+                
 
 
 
@@ -182,11 +206,14 @@ class VidConvertWindow(QWidget, Ui_Form):
 
 
     def getItem(self):
-		#Yet to be implemented
+		
+        #Here we get the selected format
+
         print('Got Item')
         index = self.listViewFormat.currentIndex()
         sel_format = index.data(Qt.DisplayRole)
         self.selected_format = sel_format
+        print(self.selected_format)
 
 
 if __name__ == "__main__":
