@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'form.ui',
 # licensing of 'form.ui' applies.
 #
-# Created: Sat Dec 29 14:00:49 2018
+# Created: Mon Dec 31 14:19:26 2018
 #      by: pyside2-uic  running on PySide2 5.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -50,10 +50,9 @@ class Ui_Form(object):
         self.btnStop.setText("")
         self.btnStop.setObjectName("btnStop")
         self.horizontalLayout_2.addWidget(self.btnStop)
-        self.pushButton = QtWidgets.QPushButton(Form)
-        self.pushButton.setText("")
-        self.pushButton.setObjectName("pushButton")
-        self.horizontalLayout_2.addWidget(self.pushButton)
+        self.btnClearQueue = QtWidgets.QPushButton(Form)
+        self.btnClearQueue.setObjectName("btnClearQueue")
+        self.horizontalLayout_2.addWidget(self.btnClearQueue)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
 
         self.retranslateUi(Form)
@@ -61,4 +60,5 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(QtWidgets.QApplication.translate("Form", "Form", None, -1))
+        self.btnClearQueue.setText(QtWidgets.QApplication.translate("Form", "Clear Queue", None, -1))
 

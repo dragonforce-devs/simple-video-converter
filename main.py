@@ -9,8 +9,7 @@ import threading
 from PySide2.QtWidgets import QApplication, QWidget
 from PySide2 import QtGui, QtWidgets, QtCore
 from PySide2.QtGui import QStandardItemModel, QStandardItem
-from PySide2.QtCore import Signal
-from PySide2.QtCore import QProcess, QIODevice, QByteArray, Qt
+from PySide2.QtCore import QProcess, QIODevice, QByteArray, Qt, Signal
 
 from Form import Ui_Form
 
@@ -28,11 +27,12 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.btnStart.clicked.connect(self.convertClicked)
         self.btnStop.clicked.connect(self.stop)
         self.btnOpen.clicked.connect(self.open)
+        self.btnClearQueue.clicked.connect(self.clearQueue)
         
         self.listViewFormat.clicked.connect(self.getItem)
 
         self.int_stop_flag = 1
-        self.thread_thd = QProcess() 
+        #self.thread_thd = QProcess() 
         #self.thread_thd.setWorkingDirectory('/')
         self.dat = ''
         self.signal_bar.connect(self.setBar)
@@ -45,6 +45,10 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.selected_format = ''
         self.file_list = ''
         self.current_file = ''
+        
+        self.thread_conv = threading.Thread(target = self.startConvert)
+        self.thread_conv.setDaemon(True)
+
         self.post_init()
 
 
@@ -64,7 +68,7 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.btnOpen.setFixedSize(50,30)
         self.btnStart.setFixedSize(50,30)
         self.btnStop.setFixedSize(50,30)
-        self.pushButton.setFixedSize(50,30)
+        self.btnClearQueue.setFixedSize(100,30)
 
         self.btnStop.setEnabled(False)
         self.listViewFormat.setFixedWidth(200)
@@ -83,9 +87,7 @@ class VidConvertWindow(QWidget, Ui_Form):
             convert operation.
             For now, the whole thing works for a single input only
         """
-        for index in range(self.file_list_model.rowCount()):
-            self.current_file = str(self.file_list_model.item(index).data(Qt.DisplayRole))
-            self.startConvert()
+        self.thread_conv.start()
     
     
     
@@ -95,30 +97,39 @@ class VidConvertWindow(QWidget, Ui_Form):
         
         
         #Toggling Buttons and detting current video length
-
-        dir_loc = self.current_file.rsplit('/',1)[0]
-        #print('The selected format is :', self.selected_format)
-        self.toggleButtons('set')
-        #print('ffprobe -i ' + file_loc + ' -show_entries format=duration -v quiet -of csv="p=0"> tot.txt')
-        self.thread_thd.start("sh",["-c",'ffprobe -i ' + self.current_file + ' -show_entries format=duration -v quiet -of csv="p=0">' + dir_loc + '/tot.txt'])
-        self.thread_thd.waitForFinished()
-        self.thread_thd.close()
         
-        #Read Video length
-        with open((dir_loc+'/tot.txt'), 'r') as f:
-            self.float_timetot = float(f.read())
-            #print(self.float_timetot)
 
-        self.progbarCurrent.setMaximum(self.float_timetot)
+        for index in range(self.file_list_model.rowCount()):
+            self.current_file = str(self.file_list_model.item(index).data(Qt.DisplayRole))
+            self.toggleButtons('set')
+            thread_thd = QProcess() 
+
+            dir_loc = self.current_file.rsplit('/',1)[0]
+            #print('The selected format is :', self.selected_format)
+            self.toggleButtons('set')
+            #print('ffprobe -i ' + file_loc + ' -show_entries format=duration -v quiet -of csv="p=0"> tot.txt')
+            thread_thd.start("sh",["-c",'ffprobe -i ' + self.current_file + ' -show_entries format=duration -v quiet -of csv="p=0">' + dir_loc + '/tot.txt'])
+            thread_thd.waitForFinished()
+            thread_thd.close()
+        
+            #Read Video length
+            with open((dir_loc+'/tot.txt'), 'r') as f:
+                self.float_timetot = float(f.read())
+                #print(self.float_timetot)
+
+            self.progbarCurrent.setMaximum(self.float_timetot)
 
 
-        self.thread_thd.start("sh", ["-c","ffmpeg -i " + self.current_file + " " + dir_loc  + "/testr.avi 2>" + dir_loc + "/test.txt"]) #Start the conversion process
-        print("starting Convert")
+            thread_thd.start("sh", ["-c","ffmpeg -i " + self.current_file + " " + dir_loc  + "/testr.avi 2>" + dir_loc + "/test.txt"]) #Start the conversion process
+            print("starting Convert")
 
-        #Read the log file to set progress using a new thread
-        p = threading.Thread(target = self.readFile)
-        p.setDaemon(True)
-        p.start()
+            #Read the log file to set progress using a new thread
+            p = threading.Thread(target = self.readFile)
+            p.setDaemon(True)
+            p.start()
+            thread_thd.waitForFinished()
+            self.progbarCurrent.setValue(self.float_timetot)
+            self.toggleButtons('reset')
 
         
         
@@ -181,8 +192,8 @@ class VidConvertWindow(QWidget, Ui_Form):
                         #print(end)
                         if (end >= 0.98):
                             #print('> 0.98')
-                            self.signal_bar.emit(self.float_timetot)
-                            self.toggleButtons('reset')
+                            #self.signal_bar.emit(self.float_timetot)
+                            #self.toggleButtons('reset')
                             i=0
                             
                         else:
@@ -220,6 +231,9 @@ class VidConvertWindow(QWidget, Ui_Form):
         sel_format = index.data(Qt.DisplayRole)
         self.selected_format = sel_format
         print(self.selected_format)
+    
+    def clearQueue(self):
+        self.file_list_model.clear()
 
 
 if __name__ == "__main__":
