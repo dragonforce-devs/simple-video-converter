@@ -66,9 +66,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="btnClearQueue">
        <property name="text">
-        <string/>
+        <string>Clear Queue</string>
        </property>
       </widget>
      </item>
