@@ -2,6 +2,7 @@
 This is a video converter
 """
 import sys
+import os
 
 from time import sleep
 
@@ -46,8 +47,7 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.file_list = ''
         self.current_file = ''
         
-        self.thread_conv = threading.Thread(target = self.startConvert)
-        self.thread_conv.setDaemon(True)
+        
 
         self.post_init()
 
@@ -80,8 +80,10 @@ class VidConvertWindow(QWidget, Ui_Form):
 
     def convertClicked(self):
         
-        
+        self.thread_conv = threading.Thread(target = self.startConvert)
+        self.thread_conv.setDaemon(True) 
         self.thread_conv.start()
+        
     
     
     
@@ -105,19 +107,19 @@ class VidConvertWindow(QWidget, Ui_Form):
             #print('The selected format is :', self.selected_format)
             self.toggleButtons('set')
             #print('ffprobe -i ' + file_loc + ' -show_entries format=duration -v quiet -of csv="p=0"> tot.txt')
-            thread_thd.start("sh",["-c",'ffprobe -i ' + self.current_file + ' -show_entries format=duration -v quiet -of csv="p=0">' + dir_loc + '/tot.txt'])
+            thread_thd.start("sh",["-c",'ffprobe -i ' + self.current_file + ' -show_entries format=duration -v quiet -of csv="p=0">' + dir_loc + '/tot.dat'])
             thread_thd.waitForFinished()
             thread_thd.close()
         
             #Read Video length
-            with open((dir_loc+'/tot.txt'), 'r') as f:
+            with open((dir_loc+'/tot.dat'), 'r') as f:
                 self.float_timetot = float(f.read())
                 #print(self.float_timetot)
 
             self.progbarCurrent.setMaximum(self.float_timetot)
 
 
-            thread_thd.start("sh", ["-c","ffmpeg -i " + self.current_file + " " + dir_loc  + "/testr.avi 2>" + dir_loc + "/test.txt"]) #Start the conversion process
+            thread_thd.start("sh", ["-c","ffmpeg -i " + self.current_file + " " + dir_loc  + "/" + (self.current_file.rsplit('/',1)[1].rsplit('.',1)[0]) + ".avi 2>" + dir_loc + "/logs.dat"]) #Start the conversion process
             print("starting Convert")
 
             #Read the log file to set progress using a new thread
@@ -127,6 +129,9 @@ class VidConvertWindow(QWidget, Ui_Form):
             thread_thd.waitForFinished()
             self.progbarCurrent.setValue(self.float_timetot)
             self.toggleButtons('reset')
+            os.remove(dir_loc + "/logs.dat")
+            os.remove(dir_loc + "/tot.dat")
+        sys.exit()
 
         
         
@@ -174,7 +179,7 @@ class VidConvertWindow(QWidget, Ui_Form):
         while i==1:
             try:
                 #print(self.current_file.rsplit('/',1)[0] + '/test.txt')
-                with open((self.current_file.rsplit('/',1)[0] + '/test.txt'), 'r') as f:
+                with open((self.current_file.rsplit('/',1)[0] + '/logs.dat'), 'r') as f:
                     
                     lines = f.read().splitlines() #Get the end line
                     last_line = lines[-1]
@@ -190,10 +195,8 @@ class VidConvertWindow(QWidget, Ui_Form):
                         end = int_progress/self.float_timetot
                         #print(end)
                         if (end >= 0.98):
-                            #print('> 0.98')
-                            #self.signal_bar.emit(self.float_timetot)
-                            #self.toggleButtons('reset')
                             i=0
+                            sys.exit()
                             
                         else:
                             pass
