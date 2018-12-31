@@ -80,13 +80,7 @@ class VidConvertWindow(QWidget, Ui_Form):
 
     def convertClicked(self):
         
-        #Getting all items from file_list_model
-        """
-            This part has not yet been fully implemented.
-            Here our objective is to iterate over all the list items and perform the
-            convert operation.
-            For now, the whole thing works for a single input only
-        """
+        
         self.thread_conv.start()
     
     
@@ -100,8 +94,11 @@ class VidConvertWindow(QWidget, Ui_Form):
         
 
         for index in range(self.file_list_model.rowCount()):
+
+            #Get File locations from file_list_model
             self.current_file = str(self.file_list_model.item(index).data(Qt.DisplayRole))
             self.toggleButtons('set')
+
             thread_thd = QProcess() 
 
             dir_loc = self.current_file.rsplit('/',1)[0]
@@ -135,6 +132,8 @@ class VidConvertWindow(QWidget, Ui_Form):
         
     
     def stop(self):
+
+        #Not yet implemented
 
         self.int_stop_flag = 0
         self.toggleButtons('reset')
