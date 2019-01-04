@@ -29,15 +29,16 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.btnStop.clicked.connect(self.stop)
         self.btnOpen.clicked.connect(self.open)
         self.btnClearQueue.clicked.connect(self.clear_queue)
-        
+         
         self.listViewFormat.clicked.connect(self.get_format_item)
 
         self.int_stop_flag = 1
-        self.thread_thd = ''
+        self.ffmpeg_process = ''
+        self.ffprobe_process = ''
         #self.thread_thd.setWorkingDirectory('/')
         self.dat = ''
         self.signal_bar.connect(self.set_bar)
-        
+        #self.ffmpeg_process.readyReadStandardOutput.connect(self.read_output) 
         self.file_list_model = QStandardItemModel(self.listViewFiles)
         self.listViewFiles.setModel(self.file_list_model)
         self.format_list_model = QStandardItemModel(self.listViewFormat)
@@ -46,9 +47,9 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.selected_format = ''
         self.current_file = ''
         self.current_dir = ''
-        self.thread_conv = '' 
-        self.thread_read = ''
-
+        #self.thread_conv = '' 
+        self.int_index = 0
+        self.arr_file_lengths = []
         self.post_init()
 
 
@@ -80,10 +81,32 @@ class VidConvertWindow(QWidget, Ui_Form):
 
     def convert_clicked(self):
         
+        
+        self.int_index = 0
+        for index in range(self.file_list_model.rowCount()):
+    
+                        
+            self.ffprobe_process = QProcess()
+
+            self.ffprobe_process.readyReadStandardOutput.connect(self.read_ffprobe)
+            #Get File locations from file_list_model
+            self.current_file = str(self.file_list_model.item(index).data(Qt.DisplayRole))
+            str_dir_loc = self.current_file.rsplit('/',1)[0] 
+            self.ffprobe_process.setWorkingDirectory(str_dir_loc)
+            str_file_name = self.current_file.rsplit('/',1)[-1]
+            print(self.current_file + '\n' + str_dir_loc + '\t' + str_file_name)
+            self.ffprobe_process.start('ffprobe -i "' + str_file_name + '" -show_entries format=duration -v quiet -of csv="p=0"')
+            self.ffprobe_process.waitForFinished()
+ 
+        self.int_index = 0 
+        print(self.arr_file_lengths) 
+        
+        self.toggle_buttons('set')
+
         self.int_stop_flag = 1
-        self.thread_conv = threading.Thread(target = self.start_convert)
-        self.thread_conv.setDaemon(True) 
-        self.thread_conv.start()
+        thread_conv = threading.Thread(target = self.start_convert)
+        thread_conv.setDaemon(True) 
+        thread_conv.start()
         
     
     
@@ -94,70 +117,47 @@ class VidConvertWindow(QWidget, Ui_Form):
         
         
         #Toggling Buttons and detting current video length
-        
+        print('reached start Convert')
 
         for index in range(self.file_list_model.rowCount()):
-
-            if (self.int_stop_flag == 0):
-                print("Breaking from start_convert")
-                break
-
+    
+                        
+            self.progbarCurrent.setMaximum(self.arr_file_lengths[self.int_index])
+            self.ffmpeg_process = QProcess()
+            #self.ffmpeg_process.Daemon = True
+            self.ffmpeg_process.readyReadStandardError.connect(self.read_output)
             #Get File locations from file_list_model
             self.current_file = str(self.file_list_model.item(index).data(Qt.DisplayRole))
-            self.toggle_buttons('set')
 
-            self.thread_thd = QProcess() 
-
-            dir_loc = self.current_file.rsplit('/',1)[0]
-            self.current_dir = dir_loc
-            #print('The selected format is :', self.selected_format)
-            self.toggle_buttons('set')
-            #print('ffprobe -i ' + file_loc + ' -show_entries format=duration -v quiet -of csv="p=0"> tot.txt')
-            self.thread_thd.start("sh",["-c",'ffprobe -i ' + self.current_file + ' -show_entries format=duration -v quiet -of csv="p=0">' + self.current_dir + '/tot.dat'])
+            str_dir_loc = self.current_file.rsplit('/',1)[0] 
+            str_file_name = self.current_file.rsplit('/',1)[-1]
+            self.ffmpeg_process.setWorkingDirectory(str_dir_loc)
             
-            #self.thread_thd.waitForFinished() [This operation is causing problem. Hence the try-except]
-            #self.thread_thd.close()
+            print(self.current_file + '\n' + str_dir_loc + '\t' + str_file_name)
+            print('ffmpeg -i "' + str_file_name + '" "' + str_file_name.rsplit('.',1)[0] + '.avi"')
+            self.ffmpeg_process.start('ffmpeg -i "' + str_file_name + '" "' + str_file_name.rsplit('.',1)[0] + '.avi"' )
+            self.ffmpeg_process.waitForFinished()
+            self.ffmpeg_process.close()
+            self.int_index += 1
+
+        self.toggle_buttons('reset')
+        print('Ended') 
         
-            #Read Video length
-            try:
-                with open((self.current_dir + '/tot.dat'), 'r') as f:
-                    self.float_timetot = float(f.read())
-            except:
-                sleep(0.4)
-                with open((self.current_dir + '/tot.dat'), 'r') as f:
-                    self.float_timetot = float(f.read())
-            
-            self.thread_thd.close()
-            self.progbarCurrent.setMaximum(self.float_timetot)
-
-
-            self.thread_thd.start("sh", ["-c","ffmpeg -i " + self.current_file + " " + self.current_dir  + "/" + (self.current_file.rsplit('/',1)[1].rsplit('.',1)[0]) + ".avi 2>" + dir_loc + "/logs.dat"]) #Start the conversion process
-            print("starting Convert")
-
-            #Read the log file to set progress using a new thread
-            self.thread_read = threading.Thread(target = self.read_file)
-            self.thread_read.setDaemon(True)
-            self.thread_read.start()
-            self.thread_thd.waitForFinished()
-            self.progbarCurrent.setValue(self.float_timetot)
-            self.toggle_buttons('reset')
-        sys.exit()
-
+    
+    
+    
+    def read_ffprobe(self):
         
+        str_op = self.ffprobe_process.readAllStandardOutput().data().decode("utf-8")
+        self.arr_file_lengths.append(float(str_op))
+        self.int_index += 1
+
         
     
     def stop(self):
 
         #Not yet implemented
-        self.int_stop_flag = 0
-        pid = (self.thread_thd.pid())
-        print(pid)
-        os.system("kill $(pgrep -P "+str(pid)+")")
-       
-        #self.thread_thd.kill()
-        print("killed")
-        self.toggle_buttons('reset')
-        self.clear_logs(self.current_dir)
+        print('Yet to be implemented')
 
 
     def set_bar(self, i):
@@ -188,47 +188,21 @@ class VidConvertWindow(QWidget, Ui_Form):
 
 
    
-    def read_file(self):
+    def read_output(self):
         
+        #print(mode)
+        #print("Reading File")
+        str_op = self.ffmpeg_process.readAllStandardError().data().decode("utf-8")
+        #print(str_op)
+        if ('time=' in str_op): #filter by keyword 'time'
+            str_progress = str_op[str_op.index('time=') + len('time='):str_op.index('time=')+16]
+            print(str_progress)
+            hh, mm, ss = str_progress.split(':')
+            float_progress = (float(hh) * 3600 + float(mm) * 60)
+            ss, sss = ss.split('.')
+            float_progress = float_progress + (float(ss) + (float(sss)/100))
+            self.signal_bar.emit(float_progress)
         
-        print("Reading File")
-        i = 1
-        while i==self.int_stop_flag:
-            try:
-                #print(self.current_file.rsplit('/',1)[0] + '/test.txt')
-                with open((self.current_dir + '/logs.dat'), 'r') as f:
-                    
-                    lines = f.read().splitlines() #Get the end line
-                    last_line = lines[-1]
-                                        
-                    if ('time=' in last_line): #filter by keyword 'time'
-                        str_progress = last_line[last_line.index('time=') + len('time='):last_line.index('time=')+16]
-                        print(str_progress)
-                        hh, mm, ss = str_progress.split(':')
-                        int_progress = (float(hh) * 3600 + float(mm) * 60)
-                        ss, sss = ss.split('.')
-                        int_progress = int_progress + (float(ss) + (float(sss)/100))
-                        self.signal_bar.emit(int_progress)
-                        end = int_progress/self.float_timetot
-                        #print(end)
-                        if (end >= 0.98):
-                            print(">0.98:")
-                            i=0
-                            self.clear_logs(self.current_dir)
-                            sys.exit()
-                            
-                        else:
-                            pass
-                    
-                    else:
-                        pass
-            except:
-                pass
-
-        print("Breaking from read_file", self.int_stop_flag)
-                
-
-
 
     
     def toggle_buttons(self,i):
@@ -258,10 +232,6 @@ class VidConvertWindow(QWidget, Ui_Form):
     def clear_queue(self):
         self.file_list_model.clear()
         self.file_list_model.clear()
-
-    def clear_logs(self, dir_loc: str):
-         os.remove(dir_loc + "/logs.dat")
-         os.remove(dir_loc + "/tot.dat")
 
 
 
