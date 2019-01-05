@@ -20,6 +20,8 @@ class VidConvertWindow(QWidget, Ui_Form):
     main class
     """
     signal_bar = Signal(float, str)
+    signal_buttons = Signal(str)
+    signal_file_name = Signal(str)
     float_timetot = 0
     def __init__(self):
         super().__init__()
@@ -33,11 +35,14 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.listViewFormat.clicked.connect(self.get_format_item)
 
         self.int_stop_flag = 1
-        self.ffmpeg_process = ''
-        self.ffprobe_process = ''
+        self.ffmpeg_process = None
+        self.ffprobe_process = None
         #self.thread_thd.setWorkingDirectory('/')
         self.dat = ''
+
         self.signal_bar.connect(self.set_bar)
+        self.signal_buttons.connect(self.toggle_buttons)
+        self.signal_file_name.connect(self.set_label_text)
         #self.ffmpeg_process.readyReadStandardOutput.connect(self.read_output) 
         self.file_list_model = QStandardItemModel(self.listViewFiles)
         self.listViewFiles.setModel(self.file_list_model)
@@ -71,6 +76,7 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.btnStart.setFixedSize(50,30)
         self.btnStop.setFixedSize(50,30)
         self.btnClearQueue.setFixedSize(100,30)
+        self.label_3.setFixedSize(90,30)
 
         self.btnStop.setEnabled(False)
         self.listViewFormat.setFixedWidth(200)
@@ -83,12 +89,15 @@ class VidConvertWindow(QWidget, Ui_Form):
     def convert_clicked(self):
         
         
-        
+        self.progbarTotal.setValue(0)
+        self.progbarCurrent.setValue(0)
+        self.progbarTotal.setMaximum(self.float_total_length)
+        self.int_stop_flag = 1
         thread_conv = threading.Thread(target = self.start_convert)
         thread_conv.setDaemon(True) 
         
         thread_conv.start()
-        
+  
     
     def post_file_load(self):
         
@@ -97,10 +106,11 @@ class VidConvertWindow(QWidget, Ui_Form):
         print('post file load')
         self.arr_file_lengths.clear()
         self.float_total_length = 0.0
+        self.ffprobe_process = None
         
         for index in range(self.file_list_model.rowCount()):
     
-                        
+            
             self.ffprobe_process = QProcess()
 
             self.ffprobe_process.readyReadStandardOutput.connect(self.read_ffprobe)
@@ -113,32 +123,43 @@ class VidConvertWindow(QWidget, Ui_Form):
             self.ffprobe_process.start('ffprobe -i "' + str_file_name + '" -show_entries format=duration -v quiet -of csv="p=0"')
             self.ffprobe_process.waitForFinished()
             #self.ffprobe_process.close()
+        
         print(self.arr_file_lengths)
     
     
     def start_convert(self):
         
-        
+        self.ffmpeg_process = None
         self.int_index = 0
-        self.toggle_buttons('set')
-        print('reached start Convert')
-        self.progbarTotal.setMaximum(self.float_total_length)
+        self.signal_buttons.emit('set')
         print(self.float_total_length)
-        self.progbarTotal.setValue(0)
+        print('reached start Convert')
+        
+        
+
         for index in range(self.file_list_model.rowCount()):
-    
+            
+
+
+            if(self.int_stop_flag == 0):
+                print('Breaking')
+                break
+
+
                         
             self.progbarCurrent.setMaximum(self.arr_file_lengths[self.int_index])
+            
             self.ffmpeg_process = QProcess()
             #self.ffmpeg_process.Daemon = True
             self.ffmpeg_process.readyReadStandardError.connect(self.read_output)
             #Get File locations from file_list_model
             self.current_file = str(self.file_list_model.item(index).data(Qt.DisplayRole))
+            #self.signal_file_name.emit(self.current_file)
 
             str_dir_loc = self.current_file.rsplit('/',1)[0] 
             str_file_name = self.current_file.rsplit('/',1)[-1]
             self.ffmpeg_process.setWorkingDirectory(str_dir_loc)
-            
+                        
             #print(self.current_file + '\n' + str_dir_loc + '\t' + str_file_name)
             #print('ffmpeg -i "' + str_file_name + '" "' + str_file_name.rsplit('.',1)[0] + '.avi"')
             self.ffmpeg_process.start('ffmpeg -i "' + str_file_name + '" "' + str_file_name.rsplit('.',1)[0] + '.avi"' )
@@ -146,7 +167,7 @@ class VidConvertWindow(QWidget, Ui_Form):
             #self.ffmpeg_process.close()
             self.int_index += 1
 
-        self.toggle_buttons('reset')
+        self.signal_buttons.emit('reset')
         print('Ended') 
         
     
@@ -163,10 +184,17 @@ class VidConvertWindow(QWidget, Ui_Form):
     
     def stop(self):
 
-        #Not yet implemented
-        print('Yet to be implemented')
+        
+        self.int_stop_flag = 0
+        int_pid = self.ffmpeg_process.pid()
+        print(int_pid)
+        self.progbarCurrent.setValue(0.1)
+        self.progbarTotal.setValue(0.1)
 
-
+        os.system('kill ' + str(int_pid))
+        self.labelFileName.setText('Process Interrupted')    
+    
+    
     def set_bar(self, i: float, mode: str):
         
         #Set Progress bar from the received signal
@@ -175,6 +203,8 @@ class VidConvertWindow(QWidget, Ui_Form):
         else:
             self.progbarTotal.setValue(i)
 
+    
+    
     def add_to_listView(self, names, model: QStandardItemModel, checkable: bool):
 
         for items in names:
@@ -214,6 +244,8 @@ class VidConvertWindow(QWidget, Ui_Form):
             ss, sss = ss.split('.')
             float_progress = float_progress + (float(ss) + (float(sss)/100))
             self.signal_bar.emit(float_progress, 'current')
+            self.signal_file_name.emit(self.current_file)
+            #print(float_progress)
             if(self.int_index == 0):
                 self.signal_bar.emit(float_progress, 'total')
             
@@ -221,7 +253,8 @@ class VidConvertWindow(QWidget, Ui_Form):
                 self.signal_bar.emit(float(self.arr_file_lengths[self.int_index-1])+float_progress, 'total')
             
 
-        
+    
+
 
     
     def toggle_buttons(self,i):
@@ -250,7 +283,10 @@ class VidConvertWindow(QWidget, Ui_Form):
     
     def clear_queue(self):
         self.file_list_model.clear()
-        
+    
+
+    def set_label_text(self, name: str):
+        self.labelFileName.setText(name)
 
 
 

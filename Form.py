@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'form.ui',
 # licensing of 'form.ui' applies.
 #
-# Created: Tue Jan  1 10:53:35 2019
+# Created: Sat Jan  5 14:05:36 2019
 #      by: pyside2-uic  running on PySide2 5.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -35,10 +35,23 @@ class Ui_Form(object):
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
+        self.label = QtWidgets.QLabel(self.tab)
+        self.label.setObjectName("label")
+        self.verticalLayout.addWidget(self.label)
         self.progbarTotal = QtWidgets.QProgressBar(self.tab)
         self.progbarTotal.setProperty("value", 24)
         self.progbarTotal.setObjectName("progbarTotal")
         self.verticalLayout.addWidget(self.progbarTotal)
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.label_3 = QtWidgets.QLabel(self.tab)
+        self.label_3.setObjectName("label_3")
+        self.horizontalLayout_4.addWidget(self.label_3)
+        self.labelFileName = QtWidgets.QLabel(self.tab)
+        self.labelFileName.setText("")
+        self.labelFileName.setObjectName("labelFileName")
+        self.horizontalLayout_4.addWidget(self.labelFileName)
+        self.verticalLayout.addLayout(self.horizontalLayout_4)
         self.progbarCurrent = QtWidgets.QProgressBar(self.tab)
         self.progbarCurrent.setProperty("value", 24)
         self.progbarCurrent.setObjectName("progbarCurrent")
@@ -75,7 +88,9 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(QtWidgets.QApplication.translate("Form", "Form", None, -1))
+        self.label.setText(QtWidgets.QApplication.translate("Form", "Total:", None, -1))
+        self.label_3.setText(QtWidgets.QApplication.translate("Form", "Current:", None, -1))
         self.btnClearQueue.setText(QtWidgets.QApplication.translate("Form", "Clear Queue", None, -1))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtWidgets.QApplication.translate("Form", "Main", None, -1))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtWidgets.QApplication.translate("Form", "Main Window", None, -1))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QtWidgets.QApplication.translate("Form", "Additional Settings", None, -1))
 
