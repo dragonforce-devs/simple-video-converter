@@ -31,7 +31,9 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.btnStop.clicked.connect(self.stop)
         self.btnOpen.clicked.connect(self.open)
         self.btnClearQueue.clicked.connect(self.clear_queue)
-         
+        
+        self.crfSlider.sliderMoved.connect(self.slider_val)
+
         self.listViewFormat.clicked.connect(self.get_format_item)
 
         self.int_stop_flag = 1
@@ -56,8 +58,13 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.int_index = 0
         self.arr_file_lengths = []
         self.float_total_length = 0.0
-        self.post_init()
+        
+        self.str_preset = ['ultrafast', 'superfast', 'veryfast', 'faster', 'fast', 'medium', 'slow', 'slower', 'veryslow', 'placebo']
+        self.str_reso = ['1080', '720', '480', '320']
 
+        self.set_combo()
+        self.post_init()
+        
 
 
     def post_init(self):
@@ -70,13 +77,23 @@ class VidConvertWindow(QWidget, Ui_Form):
 
 
         self.setWindowTitle("Simple Video Converter")
-        self.setGeometry(100, 100, 640, 480)
+        self.setGeometry(100, 100, 768, 480)
         
         self.btnOpen.setFixedSize(50,30)
         self.btnStart.setFixedSize(50,30)
         self.btnStop.setFixedSize(50,30)
         self.btnClearQueue.setFixedSize(100,30)
         self.label_3.setFixedSize(90,30)
+        
+        self.textDest.setFixedHeight(24)
+        self.textFrameRate.setFixedSize(50,24)
+        self.comboPreset.setFixedSize(150,24)
+        self.comboReso.setFixedSize(150,24)
+        
+        self.crfSlider.setMinimum(0)
+        self.crfSlider.setMaximum(100)
+        self.crfSlider.setValue(18)
+        self.labelCRFVal.setText('18')
 
         self.btnStop.setEnabled(False)
         self.listViewFormat.setFixedWidth(200)
@@ -85,6 +102,14 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.add_to_listView(['avi', 'mp4', 'wmv'], self.format_list_model, False)
 
         
+    def set_combo(self):
+        for i in self.str_preset:
+            self.comboPreset.addItem(i)
+        self.comboPreset.setCurrentIndex(4) 
+        for i in self.str_reso:
+            self.comboReso.addItem(i+'p')
+
+
 
     def convert_clicked(self):
         
@@ -288,6 +313,9 @@ class VidConvertWindow(QWidget, Ui_Form):
     def set_label_text(self, name: str):
         self.labelFileName.setText(name)
 
+    def slider_val(self):
+        int_val = self.crfSlider.value()
+        self.labelCRFVal.setText(str(int_val))
 
 
 if __name__ == "__main__":
