@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'form.ui',
 # licensing of 'form.ui' applies.
 #
-# Created: Tue Jan 22 18:39:54 2019
+# Created: Fri Feb  1 09:49:26 2019
 #      by: pyside2-uic  running on PySide2 5.12.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -88,9 +88,6 @@ class Ui_Form(object):
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
-        self.label_7 = QtWidgets.QLabel(self.widget)
-        self.label_7.setObjectName("label_7")
-        self.gridLayout.addWidget(self.label_7, 7, 0, 1, 1)
         self.crfSlider = QtWidgets.QSlider(self.widget)
         self.crfSlider.setOrientation(QtCore.Qt.Horizontal)
         self.crfSlider.setObjectName("crfSlider")
@@ -104,9 +101,6 @@ class Ui_Form(object):
         self.labelCRFVal = QtWidgets.QLabel(self.widget)
         self.labelCRFVal.setObjectName("labelCRFVal")
         self.gridLayout.addWidget(self.labelCRFVal, 3, 2, 1, 1)
-        self.comboReso = QtWidgets.QComboBox(self.widget)
-        self.comboReso.setObjectName("comboReso")
-        self.gridLayout.addWidget(self.comboReso, 7, 2, 1, 1)
         self.textFrameRate = QtWidgets.QTextEdit(self.widget)
         self.textFrameRate.setObjectName("textFrameRate")
         self.gridLayout.addWidget(self.textFrameRate, 1, 2, 1, 1)
@@ -135,16 +129,16 @@ class Ui_Form(object):
         self.textDest.setSizePolicy(sizePolicy)
         self.textDest.setObjectName("textDest")
         self.horizontalLayout_5.addWidget(self.textDest)
-        self.pushButton = QtWidgets.QPushButton(self.widget)
-        self.pushButton.setObjectName("pushButton")
-        self.horizontalLayout_5.addWidget(self.pushButton)
+        self.btnDest = QtWidgets.QPushButton(self.widget)
+        self.btnDest.setObjectName("btnDest")
+        self.horizontalLayout_5.addWidget(self.btnDest)
         self.verticalLayout_5.addLayout(self.horizontalLayout_5)
         self.verticalLayout_6.addLayout(self.verticalLayout_5)
         self.tabWidget.addTab(self.widget, "")
         self.verticalLayout_2.addWidget(self.tabWidget)
 
         self.retranslateUi(Form)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):
@@ -152,13 +146,12 @@ class Ui_Form(object):
         self.label.setText(QtWidgets.QApplication.translate("Form", "Total:", None, -1))
         self.label_3.setText(QtWidgets.QApplication.translate("Form", "Current:", None, -1))
         self.btnClearQueue.setText(QtWidgets.QApplication.translate("Form", "Clear Queue", None, -1))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtWidgets.QApplication.translate("Form", "Main", None, -1))
-        self.label_7.setText(QtWidgets.QApplication.translate("Form", "Resolution:", None, -1))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtWidgets.QApplication.translate("Form", "Tab 1", None, -1))
         self.label_8.setText(QtWidgets.QApplication.translate("Form", "Preset:", None, -1))
         self.label_2.setText(QtWidgets.QApplication.translate("Form", "Frame Rate:", None, -1))
         self.labelCRFVal.setText(QtWidgets.QApplication.translate("Form", "00", None, -1))
         self.label_5.setText(QtWidgets.QApplication.translate("Form", "CRF:", None, -1))
         self.label_4.setText(QtWidgets.QApplication.translate("Form", "Destination:", None, -1))
-        self.pushButton.setText(QtWidgets.QApplication.translate("Form", "Browse", None, -1))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.widget), QtWidgets.QApplication.translate("Form", "Video", None, -1))
+        self.btnDest.setText(QtWidgets.QApplication.translate("Form", "Browse", None, -1))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.widget), QtWidgets.QApplication.translate("Form", "Tab 2", None, -1))
 

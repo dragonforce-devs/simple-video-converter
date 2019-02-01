@@ -7,7 +7,7 @@ import os
 from time import sleep
 
 import threading
-from PySide2.QtWidgets import QApplication, QWidget, QMessageBox, QFileDialog
+from PySide2.QtWidgets import QApplication, QWidget, QMessageBox
 from PySide2 import QtGui, QtWidgets, QtCore
 from PySide2.QtGui import QStandardItemModel, QStandardItem
 from PySide2.QtCore import QProcess, QIODevice, QByteArray, Qt, Signal
@@ -54,7 +54,6 @@ class VidConvertWindow(QWidget, Ui_Form):
         self.selected_format = ''
         self.current_file = ''
         self.current_dir = ''
-        self.str_destination = ''
         #self.thread_conv = '' 
         self.int_index = 0
         self.arr_file_lengths = []
@@ -208,7 +207,7 @@ class VidConvertWindow(QWidget, Ui_Form):
             str_flag += ' -crf ' + self.labelCRFVal.text()
             if( self.textFrameRate.toPlainText() != ''):
                 str_flag += ' -r ' + self.textFrameRate.toPlainText()
-            str_flag += ' ' + self.str_destination + '/' + str_op
+            str_flag += ' ' + str_op
             
             
                   
@@ -285,18 +284,11 @@ class VidConvertWindow(QWidget, Ui_Form):
         Select Video Files
         """
         #self.file_list_model.clear() 
-        list_loc, _ = QtWidgets.QFileDialog.getOpenFileNames(None,"Open File","/home", "Videos (*.mp4 *.avi *.wmv *.mkv *.flv *.dat);;All Files(*.*)")
+        list_loc, _ = QtWidgets.QFileDialog.getOpenFileNames(None,"Open File","", "Videos (*.mp4 *.avi *.wmv *.mkv *.flv *.dat);;All Files(*.*)")
         
         self.add_to_listView(list_loc, self.file_list_model, False)
         self.file_list = list_loc
         self.post_file_load()
-
-
-
-    def dest(self):
-        str_dir = QFileDialog.getExistingDirectory(self, "Open Directory", "/home", QFileDialog.ShowDirsOnly)
-        self.str_destination = str_dir
-        self.textDest.setPlainText(self.str_destination)
 
 
    
